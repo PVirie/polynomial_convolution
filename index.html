@@ -17,25 +17,34 @@
         
     </div>
     <div class="content paper">
-        <h1>Polynomial algebra as convolution</h1>
+        <h1>&#8747 Polynomial algebra as convolution</h1>
         <p>
             A perspective to represent polynomials.
             graph convolution.
             m-simplex.
         </p>
-        \[1 + 3x + 3y + 2x^2 + 2xy = (1 + x + y)(1 + 2x) \]
+        This polynomial \( 1 + 3x + 3y + 2x^2 + 2xy \) can be written as:
         <div class="virie-algebra-block">
-            {1 + 3x + 3y + 2x^2 + 2xy} = {1 + x + y}.{1 + 2x}
+            {1 + 3x + 3y + 2x^2 + 2xy}
         </div>
         <p>
             Muliplication is convolution.
             Division is merely a game of finding pattern.
         </p>
+        <div class="mathjax">
+        \[1 + 3x + 3y + 2x^2 + 2xy = (1 + x + y)(1 + 2x) \]
+        </div>
+        <div class="virie-algebra-block">
+            {1 + 3x + 3y + 2x^2 + 2xy} = {1 + x + y}.{1 + 2x}
+        </div>
         <ul>
             <li><p>Solve corners first.</p></li>
             <li><p>Compare to long division, you don't have to follow sequence if you know that the quotient is divisible by the denominator, just make sure that every bin has been counted (like convolution).</p></li>
             <li><p>If you follow the sequence, from highest degree, you will get lowest degree remainder.</p></li>
         </ul>
+        <div class="virie-algebra-block">
+            {1 + 3x + 3y + 2x^2 + 2xy}/{1 + 2x} = {1 + x + y}
+        </div>
         <p>
             Using human visual cortex to solve polynomial algebra,
             we can exploit the consistency in the structure.
@@ -50,7 +59,10 @@
             I hope this idea will help those who struggle in math.
         </p>
     </div>
-    <script src="./src/main.js" crossorigin></script>
+    <script src="./libs/svg.min.js"></script>
+    <script src="./src/polynomial.js"></script>
+    <script src="./src/draw_simplex.js"></script>
+    <script src="./src/main.js"></script>
 </body>
 
 </html>
