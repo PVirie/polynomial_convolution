@@ -1,0 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap');
+
+html {
+    margin: 0px;
+    padding: 0px;
+    font-family: 'DM Mono', monospace;
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.content {
+    max-width: 50%;
+}
+
+@media only screen and (max-width: 800px) {
+    .content {
+    	max-width: 90%;
+    }
+}
+

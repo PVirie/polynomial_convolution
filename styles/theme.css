@@ -1,0 +1,41 @@
+/* -- Contents -- */
+
+body {
+    color: #333f;
+    background-color: #f7fffc;
+}
+
+.paper {
+    background-color: transparent;
+}
+
+.virie-algebra-block {
+    background-color: transparent;
+    filter: drop-shadow(1px 1px 2px #1117);
+}
+
+p {
+    text-align: justify;
+    text-justify: inter-word;
+}
+
+/* -- Plots -- */
+
+svg rect {
+    rx: 5px;
+    ry: 5px;
+    /*    fill: #333e;*/
+}
+
+svg .axis {}
+
+svg .pie {
+    stroke: none;
+}
+
+svg .text {
+    stroke: none;
+    width: 30px;
+    white-space: nowrap;
+    overflow: hidden;
+}
