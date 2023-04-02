@@ -100,7 +100,7 @@ simplex = (function() {
         const cy = height / 2;
         const node_padding = Math.min(width, height) * 0.2;
         const grid = new Simplex_grid(node_padding);
-        
+
         const terms = expression.value.serialize();
 
         let i = 0;
@@ -116,7 +116,7 @@ simplex = (function() {
             const runner_3 = new SVG.Runner(0.3);
             runner_3
                 .center(cx + p_t.x, cy + p_t.y)
-                .attr({ fill: '#f00', opacity: (Math.abs(term[0]) > 1e-4 ? 1.0 : 0.0) });
+                .attr({ fill: '#070', opacity: (Math.abs(term[0]) > 1e-4 ? 1.0 : 0.0) });
             runner_3.element(term_graphics[1]);
             timeline.schedule(runner_3.persist(true), 0.7, 'absolute');
         }
@@ -137,7 +137,7 @@ simplex = (function() {
             const p = grid.resolve.apply(grid, term.slice(2));
             const term_graphics = draw_term(parent, term[0], null);
             term_graphics[0].center(cx + p.x, cy + p.y).attr({ opacity: 0.0 });
-            term_graphics[1].attr({ fill: '#f00' });
+            term_graphics[1].attr({ fill: '#070' });
 
             fade_in(term_graphics[0], timeline, 0.1, 0.9);
         }
@@ -165,7 +165,7 @@ simplex = (function() {
 
             const duration_offset = (0.8 - 0.1) / (base_term_pos.length + 1);
             for (let j = 0; j < base_term_pos.length; ++j) {
-                move(term_graphics[0], timeline, 0.2, 0.1 + duration_offset * j, cx + base_term_pos[j].x + p.x, cy + base_term_pos[j].y + p.y);
+                move(term_graphics[0], timeline, duration_offset, 0.1 + duration_offset * j, cx + base_term_pos[j].x + p.x, cy + base_term_pos[j].y + p.y);
             }
 
             for (let j = 0; j < serialized_exp_0.length; ++j) {
@@ -173,7 +173,7 @@ simplex = (function() {
                 base_term_graphics[0].center(cx + base_term_pos[j].x + p.x, cy + base_term_pos[j].y + p.y);
                 base_term_graphics[1].attr({ fill: '#00f', opacity: 0.0 });
 
-                fade_in(base_term_graphics[1], timeline, 0.2, 0.1 + duration_offset * (j + 1));
+                fade_in(base_term_graphics[1], timeline, duration_offset, 0.1 + duration_offset * (j + 1));
                 const term_combine = (exp_1.get(i).mul(exp_0.get(j)));
                 const p_combine = grid.resolve.apply(grid, term_combine.serialize(exp_res.max_degree).slice(2));
                 move(base_term_graphics[0], timeline, 0.1, 0.8, cx + p_combine.x, cy + p_combine.y);
@@ -197,15 +197,24 @@ simplex = (function() {
 
         const res_term_pos = [];
         const serialized_exp_res = exp_res.serialize();
-        const duration_offset = (0.8 - 0.1) / (serialized_exp_res.length + 1);
+        const duration_offset = (0.8 - 0.1) / (serialized_exp_res.length + 2);
         for (let j = 0; j < serialized_exp_res.length; ++j) {
             const term = serialized_exp_res[j];
             const p = grid2.resolve.apply(grid2, term.slice(2));
             const term_graphics = draw_term(parent, term[0], null);
             term_graphics[0].center(cx + p.x, cy + p.y).attr({ opacity: 0.0 });
-            term_graphics[1].attr({ fill: '#f00' });
+            term_graphics[1].attr({ fill: '#00f' });
 
             fade_in(term_graphics[0], timeline, 0.1, 0.1 + duration_offset * (j + 1));
+
+            const p_t = grid.resolve.apply(grid, term.slice(2));
+            move(term_graphics[0], timeline, 0.1, 0.9, cx + p_t.x, cy + p_t.y);
+
+            const runner_3 = new SVG.Runner(0.1);
+            runner_3.attr({ fill: '#070' });
+            runner_3.element(term_graphics[1]);
+            timeline.schedule(runner_3.persist(true), 0.9, 'absolute');
+
             res_term_pos.push(p);
         }
 
@@ -217,7 +226,7 @@ simplex = (function() {
 
             const p = grid2.resolve.apply(grid2, term.slice(2));
             move(term_graphics[0], timeline, 0.1, 0, cx + p.x, cy + p.y)
-            fade_out(term_graphics[0], timeline, 0.1, 0.7);
+            fade_out(term_graphics[0], timeline, duration_offset, 0.8);
         }
 
         const serialized_exp_1 = exp_1.serialize();
@@ -227,10 +236,9 @@ simplex = (function() {
             term_graphics[0].center(width * 2 / 3 + p.x, cy + p.y);
 
             for (let j = 0; j < res_term_pos.length; ++j) {
-                move(term_graphics[0], timeline, 0.2, 0.1 + duration_offset * j, cx + res_term_pos[j].x + p.x, cy + res_term_pos[j].y + p.y);
+                move(term_graphics[0], timeline, duration_offset, 0.1 + duration_offset * j, cx + res_term_pos[j].x + p.x, cy + res_term_pos[j].y + p.y);
             }
-
-            fade_out(term_graphics[0], timeline, 0.1, 0.7);
+            fade_out(term_graphics[0], timeline, 0.1, 0.1 + duration_offset * res_term_pos.length);
         }
 
         for (let i = 0; i < serialized_exp_res.length; ++i) {
@@ -241,13 +249,18 @@ simplex = (function() {
                 const art_term_graphics = draw_term(parent, term[0] * div_term[0], null);
                 const p = grid.resolve.apply(grid, div_term.slice(2));
                 art_term_graphics[0].center(cx + res_term_pos[i].x + p.x, cy + res_term_pos[i].y + p.y);
-                art_term_graphics[1].attr({ fill: '#00f', opacity: 0.0 });
+                art_term_graphics[1].attr({ fill: '#f00', opacity: 0.0 });
 
-                fade_in(art_term_graphics[1], timeline, 0.2, 0.1 + duration_offset * (i + 1));
-                // const term_combine = (exp_1.get(i).mul(exp_0.get(j)));
-                // const p_combine = grid.resolve.apply(grid, term_combine.serialize(exp_res.max_degree).slice(2));
-                // move(art_term_graphics[0], timeline, 0.1, 0.8, cx + p_combine.x, cy + p_combine.y);
-                // fade_out(art_term_graphics[0], timeline, 0.1, 0.9);
+                fade_in(art_term_graphics[1], timeline, duration_offset, 0.1 + duration_offset * (i + 1));
+
+                const term_combine = (exp_res.get(i).mul(exp_1.get(j)));
+                const p_subtract = grid2.resolve.apply(grid2, term_combine.serialize(exp_0.max_degree).slice(2));
+                move(art_term_graphics[0], timeline,
+                    duration_offset,
+                    0.8,
+                    cx + p_subtract.x, cy + p_subtract.y)
+
+                fade_out(art_term_graphics[0], timeline, duration_offset, 0.8);
             }
         }
 
@@ -272,9 +285,9 @@ simplex = (function() {
             exp_res = left.value;
         }
 
-        if(type === ".") {
+        if (type === ".") {
             return multiply(exp_0, exp_1, exp_res, parent, width, height);
-        }else{
+        } else {
             return divide(exp_0, exp_1, exp_res, parent, width, height);
         }
     }
