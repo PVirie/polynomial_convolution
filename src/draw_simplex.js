@@ -24,22 +24,89 @@ class Simplex_grid {
             y: (this.zy * z + this.xy * x + this.yy * y) * d
         }
     }
+
+    grid(x, y) {
+        return {
+            x: this.s * x,
+            y: this.s * y
+        }
+    }
 }
 
 simplex = (function() {
 
-    const move_object = function(object, dx, duration) {
-        const runner = new SVG.Runner(duration);
-        runner.dmove(dx, 0);
-        runner.element(object);
+    const draw_term = function(parent, coefficient, degrees) {
+        const g = parent.group();
+        const coeff_g = g.text(coefficient.toString())
+            .font({
+                family: 'DM Mono',
+                size: 18,
+                anchor: 'middle'
+            })
+            .fill('#333');
 
-        // To animate, we need a timeline on which the runner is run
+        const degree_g = g.group();
+        let offset = coeff_g.bbox().w*3/4;
+        for (const [key, count] of Object.entries(degrees)) {
+            const sg = degree_g.group();
+            const base = sg.text(key.toString())
+                .font({
+                    family: 'DM Mono',
+                    size: 18,
+                    anchor: 'middle'
+                })
+                .fill('#333')
+                .center(0, 0);
+            const exp = sg.text(count.toString())
+                .font({
+                    family: 'DM Mono',
+                    size: 9,
+                    anchor: 'middle'
+                })
+                .fill((count > 1 ? '#333' : '#0000'))
+                .dmove(base.bbox().w / 2, -4);
+            sg.dmove(offset, -6);
+            offset += (base.bbox().w / 2 + exp.bbox().w);
+        }
+
+        return [g, coeff_g, degree_g];
+    }
+
+    const transform_to_simplex = function(expression, parent, grid, cx, cy) {
+        // duration is 0.0-1.0
         const timeline = new SVG.Timeline()
-        timeline.schedule(runner, 0, 'absolute');
+
+        const terms = expression.value.serialize();
+
+        let i = 0;
+        for (const term of terms) {
+            const p_s = grid.grid(((i++) - Math.floor(terms.length/2))*3, 0);
+            const term_graphics = draw_term(parent, term[0], term[1]);
+            term_graphics[0].center(cx + p_s.x, cy + p_s.y);
+
+            const runner = new SVG.Runner(0.4);
+            const p_t = grid.resolve.apply(grid, term.slice(2));
+            runner.center(cx + p_t.x, cy + p_t.y);
+            runner.element(term_graphics[0]);
+
+            timeline.schedule(runner.persist(true), 0, 'absolute');
+
+            const runner_2 = new SVG.Runner(0.5);
+            runner_2.center(cx + p_t.x*4, cy + p_t.y*8);
+            runner_2.element(term_graphics[2]);
+
+            timeline.schedule(runner_2.persist(true), 0.5, 'absolute');
+
+            const runner_3 = new SVG.Runner(0.3);
+            runner_3.center(cx + p_t.x, cy + p_t.y)
+            .attr({ fill: '#f00', opacity: (Math.abs(term[0]) > 1e-4 ? '1.0':'0.0') });
+            runner_3.element(term_graphics[1]);
+
+            timeline.schedule(runner_3.persist(true), 0.7, 'absolute');
+        }
 
         return timeline;
     }
-
 
     const draw = function(parent, expression) {
         // Set the dimensions of the plot
@@ -56,34 +123,18 @@ simplex = (function() {
         const node_size = Math.min(width, height) * 0.01;
         const node_padding = Math.min(width, height) * 0.1;
         const grid = new Simplex_grid(node_padding);
+        const cx = width / 2;
+        const cy = height / 2;
 
-        const draw_term = function(term, cx, cy) {
-            const p = grid.resolve.apply(grid, term.slice(1));
-            // const circle = polynomial_group.circle(node_size).attr({ fill: 'red', cx: cx + p.x, cy: cy + p.y });
-            const text = polynomial_group.text(term[0].toString())
-                .font({
-                    family: 'DM Mono', // Use the custom font
-                    size: 18, // Set the font size
-                    anchor: 'middle', // Set the text anchor
-                })
-                .fill('#f00')
-                .move(cx + p.x, cy + p.y);
-        }
+        let timeline = null;
 
         if (expression.type === "node") {
-            const terms = expression.value.compile();
-            for (const term of terms) {
-                draw_term(term, width / 2, height / 2);
-            }
+            timeline = transform_to_simplex(expression, polynomial_group, grid, cx, cy);
         }
-
-
-        const initialDuration = 500;
-        const timeline = move_object(polynomial_group, 200, initialDuration);
 
         parent.addEventListener('mousemove', (e) => {
             const time = (e.clientX - container_rect.x) / container_rect.width;
-            timeline.time(Math.max(0, time) * initialDuration);
+            timeline.time(Math.max(0, time));
         });
 
     }
