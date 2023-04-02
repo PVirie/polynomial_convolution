@@ -2,10 +2,23 @@ const is_digit = function(c) {
     return (c >= '0' && c <= '9');
 }
 
+const degree_mul = function(deg1, deg2) {
+    const out = {};
+    for (const [key, value] of Object.entries(deg1)) {
+        out[key] = value;
+    }
+
+    for (const [key, value] of Object.entries(deg2)) {
+        out[key] = out[key] || 0;
+        out[key] += value;
+    }
+    return out;
+}
+
 class Term {
     constructor(sign = "+") {
         this.sign = sign;
-        this.coefficient = 1;
+        this.coefficient = (this.sign === "+" ? 1.0 : -1.0);
         this.degrees = {};
         this.digits = "";
         this.last_deg = null;
@@ -19,7 +32,7 @@ class Term {
         } else {
             if (this.digits !== "") {
                 if (this.last_deg == null) {
-                    this.coefficient = parseFloat(this.digits)*(this.sign === "+"? 1.0: -1.0);
+                    this.coefficient = parseFloat(this.digits) * (this.sign === "+" ? 1.0 : -1.0);
                 } else {
                     this.degrees[this.last_deg] += parseFloat(this.digits);
                 }
@@ -30,14 +43,39 @@ class Term {
         }
     }
 
+    mul(term) {
+        this.compile();
+        term.compile();
+        const out_term = new Term();
+        out_term.coefficient = this.coefficient * term.coefficient;
+        out_term.degrees = degree_mul(this.degrees, term.degrees);
+        return out_term;
+    }
+
     compile() {
         if (this.last_deg == null) {
-            this.coefficient = parseFloat(this.digits)*(this.sign === "+"? 1.0: -1.0);
+            this.coefficient = parseFloat(this.digits) * (this.sign === "+" ? 1.0 : -1.0);
         } else if (this.digits !== "") {
             this.degrees[this.last_deg] += parseFloat(this.digits);
         }
 
         return this;
+    }
+
+    serialize(max_degree) {
+        let total_degs = 0;
+        let degree_str = "";
+        for (const [key, value] of Object.entries(this.degrees)) {
+            total_degs += value;
+        }
+        return [
+            this.coefficient,
+            this.degrees,
+            max_degree,
+            this.degrees["x"] || 0,
+            this.degrees["y"] || 0,
+            this.degrees["z"] || max_degree - total_degs
+        ]
     }
 }
 
@@ -60,33 +98,25 @@ class Polynomial {
         if (term != null) this.terms.push(term.compile());
     }
 
+    get(i) {
+        return this.terms[i];
+    }
+
     serialize() {
         const out = [];
         this.max_degree = 0;
         for (const term of this.terms) {
-        	let deg = 0;
+            let deg = 0;
             for (const [key, value] of Object.entries(term.degrees)) {
                 deg += value;
             }
-            if(this.max_degree < deg) {
-            	this.max_degree = deg;
+            if (this.max_degree < deg) {
+                this.max_degree = deg;
             }
         }
 
         for (const term of this.terms) {
-        	let total_degs = 0;
-            let degree_str = "";
-            for (const [key, value] of Object.entries(term.degrees)) {
-            	total_degs += value;
-            }
-            out.push([
-                term.coefficient,
-                term.degrees,
-                this.max_degree, 
-                term.degrees["x"] || 0, 
-                term.degrees["y"] || 0, 
-                term.degrees["z"] || this.max_degree - total_degs
-            ]);
+            out.push(term.serialize(this.max_degree));
         }
 
         return out;
