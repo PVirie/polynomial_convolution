@@ -22,9 +22,11 @@ class Term {
         this.degrees = {};
         this.digits = "";
         this.last_deg = null;
+        this.compiled = false;
     }
 
     add(c) {
+        if(this.compiled) return;
         if (is_digit(c)) {
             this.digits += c;
         } else if (c === "^") {
@@ -44,8 +46,6 @@ class Term {
     }
 
     mul(term) {
-        this.compile();
-        term.compile();
         const out_term = new Term();
         out_term.coefficient = this.coefficient * term.coefficient;
         out_term.degrees = degree_mul(this.degrees, term.degrees);
@@ -53,12 +53,13 @@ class Term {
     }
 
     compile() {
+        if(this.compiled) return;
         if (this.last_deg == null) {
             this.coefficient = parseFloat(this.digits) * (this.sign === "+" ? 1.0 : -1.0);
         } else if (this.digits !== "") {
             this.degrees[this.last_deg] += parseFloat(this.digits);
         }
-
+        this.compiled = true;
         return this;
     }
 
