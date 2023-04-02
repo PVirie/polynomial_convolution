@@ -28,6 +28,19 @@ class Simplex_grid {
 
 simplex = (function() {
 
+    const move_object = function(object, dx, duration) {
+        const runner = new SVG.Runner(duration);
+        runner.dmove(dx, 0);
+        runner.element(object);
+
+        // To animate, we need a timeline on which the runner is run
+        const timeline = new SVG.Timeline()
+        timeline.schedule(runner, 0, 'absolute');
+
+        return timeline;
+    }
+
+
     const draw = function(parent, expression) {
         // Set the dimensions of the plot
         const container_rect = parent.getBoundingClientRect();
@@ -38,6 +51,7 @@ simplex = (function() {
 
 
         const svg = SVG().addTo(parent).size('100%', '100%');
+        const polynomial_group = svg.group()
 
         const node_size = Math.min(width, height) * 0.01;
         const node_padding = Math.min(width, height) * 0.1;
@@ -45,8 +59,8 @@ simplex = (function() {
 
         const draw_term = function(term, cx, cy) {
             const p = grid.resolve.apply(grid, term.slice(1));
-            // const circle = svg.circle(node_size).attr({ fill: 'red', cx: cx + p.x, cy: cy + p.y });
-            const text = svg.text(term[0].toString())
+            // const circle = polynomial_group.circle(node_size).attr({ fill: 'red', cx: cx + p.x, cy: cy + p.y });
+            const text = polynomial_group.text(term[0].toString())
                 .font({
                     family: 'DM Mono', // Use the custom font
                     size: 18, // Set the font size
@@ -62,6 +76,16 @@ simplex = (function() {
                 draw_term(term, width / 2, height / 2);
             }
         }
+
+
+        const initialDuration = 500;
+        const timeline = move_object(polynomial_group, 200, initialDuration);
+
+        parent.addEventListener('mousemove', (e) => {
+            const time = (e.clientX - container_rect.x) / container_rect.width;
+            timeline.time(Math.max(0, time) * initialDuration);
+        });
+
     }
 
     return {
