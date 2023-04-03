@@ -1,25 +1,47 @@
 class Simplex_grid {
-	constructor(s) {
+	constructor(axes, s) {
 		this.s = s;
-		this.cx = 0;
-		this.cy = 0;
-		this.fb = 1.0 / (2 * Math.sqrt(3));
 
-		this.zy = this.fb - 1;
-		this.zx = 0;
+		if (axes.length > 2) this.fb = 1.0 / (2 * Math.sqrt(3));
+		else this.fb = 0;
 
-		this.xy = this.fb;
-		this.xx = -0.5;
+		// axes is string: xyz, xy1, yxz, etc.
+		this.axes = {
+			1: { x: 0, y: 0 },
+			x: { x: 0, y: 0 },
+			y: { x: 0, y: 0 },
+			z: { x: 0, y: 0 },
+		};
 
-		this.yy = this.fb;
-		this.yx = 0.5;
+		this.axes[axes[0]] = {
+			x: -0.5,
+			y: this.fb,
+		};
+
+		this.axes[axes[1]] = {
+			x: 0.5,
+			y: this.fb,
+		};
+
+		if (axes.length > 2)
+			this.axes[axes[2]] = {
+				x: 0,
+				y: this.fb - 1,
+			};
 	}
 
-	resolve(d, x, y, z) {
-		return {
-			x: (this.zx * z + this.xx * x + this.yx * y) * this.s,
-			y: (this.zy * z + this.xy * x + this.yy * y) * this.s,
-		};
+	resolve(max_degree, degrees) {
+		let total_deg = 0;
+		for (const [key, value] of Object.entries(degrees)) {
+			total_deg += value;
+		}
+		let x = (max_degree - total_deg) * this.axes["1"].x;
+		let y = (max_degree - total_deg) * this.axes["1"].y;
+		for (const c in degrees) {
+			x += degrees[c] * this.axes[c].x;
+			y += degrees[c] * this.axes[c].y;
+		}
+		return { x: x * this.s, y: y * this.s };
 	}
 
 	grid(x, y) {
@@ -106,13 +128,13 @@ simplex = (function () {
 		timeline.schedule(runner2.persist(true), start + duration / 4, "absolute");
 	};
 
-	const transform_to_simplex = function (expression, parent, width, height) {
+	const transform_to_simplex = function (axes, expression, parent, width, height) {
 		// duration is 0.0-1.0
 		const timeline = new SVG.Timeline();
 		const cx = width / 2;
 		const cy = height / 2;
 		const node_padding = Math.min(200, height) * 0.2;
-		const grid = new Simplex_grid(node_padding);
+		const grid = new Simplex_grid(axes, node_padding);
 
 		const terms = expression.value.serialize();
 
@@ -137,14 +159,14 @@ simplex = (function () {
 		return timeline;
 	};
 
-	const multiply = function (exp_0, exp_1, exp_res, parent, width, height) {
+	const multiply = function (axes, exp_0, exp_1, exp_res, parent, width, height) {
 		// duration is 0.0-1.0
 		const timeline = new SVG.Timeline();
 		const cx = width / 2;
 		const cy = height / 2;
 		const node_padding = Math.min(200, height) * 0.2;
-		const grid = new Simplex_grid(node_padding);
-		const grid2 = new Simplex_grid(node_padding * 1.5);
+		const grid = new Simplex_grid(axes, node_padding);
+		const grid2 = new Simplex_grid(axes, node_padding * 1.5);
 
 		for (const term of exp_res.serialize()) {
 			const p = grid.resolve.apply(grid, term.slice(2));
@@ -190,7 +212,7 @@ simplex = (function () {
 
 				fade_in(base_term_graphics[1], timeline, duration_offset, 0.1 + duration_offset * (j + 1));
 				const term_combine = exp_1.get(i).mul(exp_0.get(j));
-				const p_combine = grid.resolve.apply(grid, term_combine.serialize(exp_res.max_degree).slice(2));
+				const p_combine = grid.resolve.apply(grid, term_combine.serialize(exp_res.max_degree, exp_res.dim).slice(2));
 				move(base_term_graphics[0], timeline, 0.1, 0.7, cx + p_combine.x, cy + p_combine.y);
 				fade_out(base_term_graphics[0], timeline, 0.1, 0.7);
 			}
@@ -201,14 +223,14 @@ simplex = (function () {
 		return timeline;
 	};
 
-	const divide = function (exp_0, exp_1, exp_res, parent, width, height) {
+	const divide = function (axes, exp_0, exp_1, exp_res, parent, width, height) {
 		// duration is 0.0-1.0
 		const timeline = new SVG.Timeline();
 		const cx = width / 2;
 		const cy = (height * 2) / 3;
 		const node_padding = Math.min(200, height) * 0.2;
-		const grid = new Simplex_grid(node_padding);
-		const grid2 = new Simplex_grid(node_padding * 1.75);
+		const grid = new Simplex_grid(axes, node_padding);
+		const grid2 = new Simplex_grid(axes, node_padding * 1.75);
 
 		const res_term_pos = [];
 		const serialized_exp_res = exp_res.serialize();
@@ -268,7 +290,7 @@ simplex = (function () {
 
 				const term_combine = exp_res.get(i).mul(exp_1.get(j));
 				residue = residue.subtract(term_combine);
-				const p_subtract = grid2.resolve.apply(grid2, term_combine.serialize(exp_0.max_degree).slice(2));
+				const p_subtract = grid2.resolve.apply(grid2, term_combine.serialize(exp_0.max_degree, exp_res.dim).slice(2));
 				move(art_term_graphics[0], timeline, duration_offset, 0.1 + duration_offset * (i + 2), cx + p_subtract.x, cy + p_subtract.y);
 				fade_out(art_term_graphics[0], timeline, duration_offset, 0.1 + duration_offset * (i + 2));
 			}
@@ -290,7 +312,7 @@ simplex = (function () {
 		return timeline;
 	};
 
-	const operation = function (expression, parent, width, height) {
+	const operation = function (axes, expression, parent, width, height) {
 		const left = expression.left;
 		const right = expression.right;
 		let exp_0, exp_1, exp_res;
@@ -307,13 +329,13 @@ simplex = (function () {
 		}
 
 		if (type === ".") {
-			return multiply(exp_0, exp_1, exp_res, parent, width, height);
+			return multiply(axes, exp_0, exp_1, exp_res, parent, width, height);
 		} else {
-			return divide(exp_0, exp_1, exp_res, parent, width, height);
+			return divide(axes, exp_0, exp_1, exp_res, parent, width, height);
 		}
 	};
 
-	const draw = function (parent, expression) {
+	const draw = function (parent, axes, expression) {
 		// Set the dimensions of the plot
 		const container_rect = parent.getBoundingClientRect();
 		const computed_style = getComputedStyle(parent);
@@ -327,9 +349,9 @@ simplex = (function () {
 		let timeline = null;
 
 		if (expression.type === "node") {
-			timeline = transform_to_simplex(expression, polynomial_group, width, height);
+			timeline = transform_to_simplex(axes, expression, polynomial_group, width, height);
 		} else if (expression.type === "=") {
-			timeline = operation(expression, polynomial_group, width, height);
+			timeline = operation(axes, expression, polynomial_group, width, height);
 		}
 
 		parent.addEventListener("mousemove", (e) => {

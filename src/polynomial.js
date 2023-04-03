@@ -81,13 +81,8 @@ class Term {
 		return this;
 	}
 
-	serialize(max_degree) {
-		let total_degs = 0;
-		let degree_str = "";
-		for (const [key, value] of Object.entries(this.degrees)) {
-			total_degs += value;
-		}
-		return [this.coefficient, this.degrees, max_degree, this.degrees["x"] || 0, this.degrees["y"] || 0, this.degrees["z"] || max_degree - total_degs];
+	serialize(max_degree, dim) {
+		return [this.coefficient, this.degrees, max_degree, this.degrees];
 	}
 }
 
@@ -141,18 +136,35 @@ class Polynomial {
 	serialize() {
 		const out = [];
 		this.max_degree = 0;
+		this.dim = 0;
 		for (const term of this.terms) {
 			let deg = 0;
-			for (const [key, value] of Object.entries(term.degrees)) {
+			const entries = Object.entries(term.degrees);
+			for (const [key, value] of entries) {
 				deg += value;
 			}
 			if (this.max_degree < deg) {
 				this.max_degree = deg;
 			}
+			if (this.dim < entries.length) {
+				this.dim = entries.length;
+			}
 		}
 
 		for (const term of this.terms) {
-			out.push(term.serialize(this.max_degree));
+			let deg = 0;
+			const entries = Object.entries(term.degrees);
+			for (const [key, value] of entries) {
+				deg += value;
+			}
+			if (this.max_degree !== deg) {
+				this.dim += 1;
+				break;
+			}
+		}
+
+		for (const term of this.terms) {
+			out.push(term.serialize(this.max_degree, this.dim));
 		}
 
 		return out;
