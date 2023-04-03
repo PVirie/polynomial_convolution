@@ -41,24 +41,31 @@
         </div>
         <p>
             Muliplication is convolution.
+        </p>
+
+        <div class="mathjax">
+            \[ (1 + x - y)(1 + 2x) = 1 + 3x - y - 2xy + 2x^2  \]
+            </div>
+            <div class="virie-algebra-block axes-xy1">
+                {1 + x - y}.{1 + 2x} = {1 + 3x - y - 2xy + 2x^2} 
+            </div>
+            
+        I have another sub-trick here, if you decide to multiply two one-dimension polynomials, do write the artifacts in diagonal.
+        As we usually convolve with the smaller operand, to reduce working memory consumption. 
+        Writing in diagonal taking less space because it only requires the number of rows equal to the number of terms in the moving operand. 
+        \[ (1 - x + x^2 - x^3 + x^4 - x^5).(1 + x + x^2 + x^3) = (1 + x^2 - x^6 - x^8)  \]
+        <div class="virie-algebra-block axes-x1">
+            {1 - x + x^2 - x^3 + x^4 - x^5}.{1 + x + x^2 + x^3} = {1 + 0x + x^2 + 0x^3 + 0x^4 + 0x^5 - x^6 + 0x^7 - x^8}
+        </div>
+        
+        <p>
             Division is merely a game of finding pattern.
         </p>
 
         <div class="virie-algebra-block axes-x1">
-            {2 - x}.{1 + 2x} = {2 + 3x - 2x^2}
-        </div>
-        
-        <div class="virie-algebra-block axes-x1">
             {2 + 3x - 2x^2}/{1 + 2x} = {2 - x}
         </div>
 
-        <div class="mathjax">
-        \[ (1 + x - y)(1 + 2x) = 1 + 3x - y - 2xy + 2x^2  \]
-        </div>
-        <div class="virie-algebra-block axes-xy1">
-            {1 + x - y}.{1 + 2x} = {1 + 3x - y - 2xy + 2x^2} 
-        </div>
-        
         <ul>
             <li><p>Solve corners first.</p></li>
             <li><p>Compare to long division, you don't have to follow sequence if you know that the quotient is divisible by the denominator, just make sure that every bin has been counted (like convolution).</p></li>
@@ -74,8 +81,13 @@
             Using human visual cortex to solve polynomial algebra,
             we can exploit the consistency in the structure.
             The benefit lies in the fact that 
-            we do not have to rearrange the degree terms to sum the coefficients.
-            We can immediately find terms at a glance.
+            <ul>
+                <li>we do not have to rearrange the degree terms to sum the coefficients.
+                    We can immediately find the location to put the terms.</li>
+                <li>and we can guess the shape of operand at a glance.</li>
+            </ul>
+        </p>
+        <p>
             Though using this method in Euclidean space, we can extend to 3 variables. But I believe that more if possible for someone that can reason with high dimension.
         </p>
 

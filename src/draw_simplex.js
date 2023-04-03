@@ -162,6 +162,7 @@ simplex = (function () {
 	const multiply = function (axes, exp_0, exp_1, exp_res, parent, width, height) {
 		// duration is 0.0-1.0
 		const timeline = new SVG.Timeline();
+		const dim = axes.length;
 		const cx = width / 2;
 		const cy = height / 2;
 		const node_padding = Math.min(200, height) * 0.2;
@@ -193,6 +194,13 @@ simplex = (function () {
 			base_term_pos.push(p);
 		}
 
+		let y_gap = 0;
+		let artifact_grid = grid;
+		if (dim === 2) {
+			y_gap = 20;
+			artifact_grid = grid2;
+		}
+
 		const serialized_exp_1 = exp_1.serialize();
 		for (let i = 0; i < serialized_exp_1.length; ++i) {
 			const term = serialized_exp_1[i];
@@ -201,13 +209,15 @@ simplex = (function () {
 			term_graphics[0].center((width * 2) / 3 + p.x, cy + p.y);
 			term_graphics[1].attr({ fill: "#070" });
 
+			const pp = artifact_grid.resolve.apply(artifact_grid, term.slice(2));
+			const y_offset = (i + 1) * y_gap;
 			for (let j = 0; j < base_term_pos.length; ++j) {
-				move(term_graphics[0], timeline, duration_offset, 0.1 + duration_offset * j, cx + base_term_pos[j].x + p.x, cy + base_term_pos[j].y + p.y);
+				move(term_graphics[0], timeline, duration_offset, 0.1 + duration_offset * j, cx + base_term_pos[j].x + pp.x, y_offset + cy + base_term_pos[j].y + pp.y);
 			}
 
 			for (let j = 0; j < serialized_exp_0.length; ++j) {
 				const base_term_graphics = draw_term(parent, term[0] * serialized_exp_0[j][0], null);
-				base_term_graphics[0].center(cx + base_term_pos[j].x + p.x, cy + base_term_pos[j].y + p.y);
+				base_term_graphics[0].center(cx + base_term_pos[j].x + pp.x, y_offset + cy + base_term_pos[j].y + pp.y);
 				base_term_graphics[1].attr({ fill: "#00f", opacity: 0.0 });
 
 				fade_in(base_term_graphics[1], timeline, duration_offset, 0.1 + duration_offset * (j + 1));
