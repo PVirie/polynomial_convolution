@@ -67,14 +67,16 @@
         </div>
 
         <div class="virie-algebra-block axes-x1">
-            {1 + 0x + x^2 + 0x^3 + 0x^4 + 0x^5 - x^6 + 0x^7 - x^8}/{1 + x + x^2 + x^3} = {1 - x + x^2 - x^3 + x^4 - x^5}
+            {1 + 0x + x^2 + 0x^3 + 0x^4 + 0x^5 - x^6 + 0x^7 - x^8}/{1 + x + x^2 + x^3} = {-x^5 + x^4 - x^3 + x^2 - x + 1}
         </div>
 
-        <ul>
-            <li><p>Solve corners first.</p></li>
-            <li><p>Compare to long division, you don't have to follow sequence if you know that the quotient is divisible by the denominator, just make sure that every bin has been counted (like convolution).</p></li>
-            <li><p>If you follow the sequence, from highest degree, you will get lowest degree remainder.</p></li>
-        </ul>
+        <p> The best practice is to solve the corners first.</p>
+        <p>
+            You may notice that I convolve both examples in different order sequences. 
+            In fact, we do not have to follow the left to right sequence as long as every bin has been convolved.    
+            Compare to long division, you don't have to follow sequence if you know that the quotient is divisible by the denominator, just make sure that every bin has been counted (like convolution).
+            If you follow the sequence, from the highest to the lowest degree, you will always get the lowest degree remainder.
+        </p>
         <div class="mathjax">
         \[ \frac{1 + 3x - y - 2xy + 2x^2}{1 + x - y} = 1 + 2x \]
         </div>
