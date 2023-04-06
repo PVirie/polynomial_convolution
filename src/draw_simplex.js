@@ -116,8 +116,9 @@ simplex = (function() {
         timeline.schedule(runner.persist(true), start, "absolute");
     };
 
-    const move = function(svg_object, timeline, duration, start, x, y) {
+    const move = function(svg_object, timeline, duration, start, x, y, ease="<>") {
         const runner = new SVG.Runner(duration);
+        runner.ease(ease);
         runner.center(x, y);
         runner.element(svg_object);
         timeline.schedule(runner.persist(true), start, "absolute");
@@ -467,46 +468,33 @@ simplex = (function() {
         const bar = control_group.line(width - 10, 0, width - 10, bar_padding * 2);
         bar.stroke({ color: "#fffc", width: 7, linecap: "round" });
 
-        move(bar, timeline, 1.0, 0, width - 10, height - bar_padding, "-");
+        move(bar, timeline, 1.0, 0, width - 10, height - bar_padding, "<>");
 
         let holding_bar = false;
         const on_bar_enter = function() {
             holding_bar = true;
             line.stroke({ color: "#9997" });
         };
-        const on_bar_move = function(clientY) {
-            const time = (clientY - container_rect.y - bar_padding) / (container_rect.height - bar_padding * 2);
-            if (holding_bar) {
-                timeline.time(Math.max(0, time));
-                return true;
-            }
-            return false;
+        const on_bar_move = function(clientY, container_rect) {
+            const time = (clientY - container_rect.top - bar_padding) / (container_rect.height - bar_padding * 2);
+            timeline.time(Math.max(0, time));
         };
         const on_bar_leave = function() {
             holding_bar = false;
             line.stroke({ color: "#9990" });
         };
-        bar.on("mousedown", on_bar_enter);
         parent.addEventListener("mousemove", (e) => {
-            if (on_bar_move(e.clientY)) {
+            on_bar_move(e.clientY, parent.getBoundingClientRect());
+        });
+        bar.on("touchstart", on_bar_enter);
+        parent.addEventListener("touchmove", (e) => {
+            if(holding_bar) {
+                on_bar_move(e.touches[0].clientY, parent.getBoundingClientRect());
                 e.preventDefault();
                 e.stopPropagation();
-                e.cancelBubble = true;
-                e.returnValue = false;
-            }
-        });
-        parent.addEventListener("touchmove", (e) => {
-            if (on_bar_move(e.touches[0].clientY)) {
-                e.preventDefault();
             }
         });
         parent.addEventListener("touchend", (e) => {
-            on_bar_leave();
-        });
-        parent.addEventListener("mouseup", (e) => {
-            on_bar_leave();
-        });
-        parent.addEventListener("mouseleave", (e) => {
             on_bar_leave();
         });
     };

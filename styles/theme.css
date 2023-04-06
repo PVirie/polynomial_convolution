@@ -28,6 +28,16 @@ body {
     overflow: auto;
 }
 
+.mathjax::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.mathjax::-webkit-scrollbar-thumb {
+    background-color: #dddc;
+    border-radius: 5px;
+}
+
 p {
     text-align: justify;
     text-justify: inter-word;
