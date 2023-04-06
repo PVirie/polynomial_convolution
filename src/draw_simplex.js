@@ -116,7 +116,7 @@ simplex = (function() {
         timeline.schedule(runner.persist(true), start, "absolute");
     };
 
-    const move = function(svg_object, timeline, duration, start, x, y, ease="<>") {
+    const move = function(svg_object, timeline, duration, start, x, y, ease = "<>") {
         const runner = new SVG.Runner(duration);
         runner.ease(ease);
         runner.center(x, y);
@@ -143,7 +143,7 @@ simplex = (function() {
         const cy = height / 2;
 
         const terms = expression.value.serialize();
-        
+
         const node_padding = Math.min((width * 2 / 3) / (expression.value.max_degree), 50);
         const grid = new Simplex_grid(axes, node_padding);
 
@@ -174,7 +174,7 @@ simplex = (function() {
         const dim = axes.length;
         const cx = width / 2;
         const cy = dim == 2 ? height / 2 : (height * 2) / 3;
-        
+
         const serialized_exp_res = exp_res.serialize();
         const serialized_exp_0 = exp_0.serialize();
         const serialized_exp_1 = exp_1.serialize();
@@ -199,8 +199,8 @@ simplex = (function() {
         for (const term of serialized_exp_0) {
             const o = grid.resolve.apply(grid, term.slice(2));
             const term_graphics = draw_term(parent, term[0], null);
-            if(dim == 2) term_graphics[0].center(cx + o.x, height/3 + o.y);
-            else term_graphics[0].center(width/3 + o.x, cy + o.y);
+            if (dim == 2) term_graphics[0].center(cx + o.x, height / 3 + o.y);
+            else term_graphics[0].center(width / 3 + o.x, cy + o.y);
 
             const p = grid2.resolve.apply(grid2, term.slice(2));
             move(term_graphics[0], timeline, 0.1, 0, cx + p.x, cy + p.y);
@@ -219,8 +219,8 @@ simplex = (function() {
             const term = serialized_exp_1[i];
             const p = grid.resolve.apply(grid, term.slice(2));
             const term_graphics = draw_term(parent, term[0], null);
-            if(dim == 2) term_graphics[0].center(cx + p.x, height*2/3 + p.y);
-            else term_graphics[0].center(width*2/3 + p.x, cy + p.y);
+            if (dim == 2) term_graphics[0].center(cx + p.x, height * 2 / 3 + p.y);
+            else term_graphics[0].center(width * 2 / 3 + p.x, cy + p.y);
             term_graphics[1].attr({ fill: "#070" });
 
             fade_half(term_graphics[1], timeline, duration_offset, 0.1);
@@ -473,22 +473,25 @@ simplex = (function() {
 
         const control_group = svg.group();
 
-        const bar_padding = height * 0.05;
-        const line = control_group.line(width - 10, bar_padding, width - 10, height - bar_padding);
+        const bar_padding = width * 0.05;
+        const line = control_group.line(bar_padding, height - 10, width - bar_padding, height - 10);
         line.stroke({ color: "#9990", width: 5, linecap: "round" });
 
-        const bar = control_group.line(width - 10, 0, width - 10, bar_padding * 2);
+        const bar = control_group.line(0, height - 10, bar_padding * 2, height - 10);
         bar.stroke({ color: "#fffc", width: 7, linecap: "round" });
 
-        move(bar, timeline, 1.0, 0, width - 10, height - bar_padding, "<>");
+        move(bar, timeline, 1.0, 0, width - bar_padding, height - 10, "-");
 
+        let touching = false;
+        let sx = null;
         let holding_bar = false;
+
         const on_bar_enter = function() {
             holding_bar = true;
             line.stroke({ color: "#9997" });
         };
-        const on_bar_move = function(clientY, container_rect) {
-            const time = (clientY - container_rect.top - bar_padding) / (container_rect.height - bar_padding * 2);
+        const on_bar_move = function(clientX, container_rect) {
+            const time = (clientX - container_rect.left - bar_padding) / (container_rect.width - bar_padding * 2);
             timeline.time(Math.max(0, time));
         };
         const on_bar_leave = function() {
@@ -496,18 +499,28 @@ simplex = (function() {
             line.stroke({ color: "#9990" });
         };
         parent.addEventListener("mousemove", (e) => {
-            on_bar_move(e.clientY, parent.getBoundingClientRect());
+            on_bar_move(e.clientX, parent.getBoundingClientRect());
         });
-        bar.on("touchstart", on_bar_enter);
+        parent.addEventListener("touchstart", (e) => {
+            sx = e.touches[0].clientX;
+        });
         parent.addEventListener("touchmove", (e) => {
-            if(holding_bar) {
-                on_bar_move(e.touches[0].clientY, parent.getBoundingClientRect());
-                e.preventDefault();
-                e.stopPropagation();
+            if (!touching) {
+                if (e.touches[0].clientX - sx > 5) {
+                    holding_bar = true;
+                }
+                touching = true;
+            } else {
+                if (holding_bar) {
+                    on_bar_move(e.touches[0].clientX, parent.getBoundingClientRect());
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
             }
         });
         parent.addEventListener("touchend", (e) => {
             on_bar_leave();
+            touching = false;
         });
     };
 
