@@ -477,27 +477,19 @@ simplex = (function() {
         const line = control_group.line(bar_padding, height - 10, width - bar_padding, height - 10);
         line.stroke({ color: "#9990", width: 5, linecap: "round" });
 
-        const bar = control_group.line(0, height - 10, bar_padding * 2, height - 10);
+        const bar = control_group.line(0, height - 10, bar_padding, height - 10);
         bar.stroke({ color: "#fffc", width: 7, linecap: "round" });
 
         move(bar, timeline, 1.0, 0, width - bar_padding, height - 10, "-");
 
-        let touching = false;
+        let touching = null;
         let sx = null;
         let sy = null;
         let holding_bar = false;
 
-        const on_bar_enter = function() {
-            holding_bar = true;
-            line.stroke({ color: "#9997" });
-        };
         const on_bar_move = function(clientX, container_rect) {
-            const time = (clientX - container_rect.left - bar_padding) / (container_rect.width - bar_padding * 2);
+            const time = (clientX - container_rect.left - bar_padding) / (container_rect.width - bar_padding);
             timeline.time(Math.max(0, time));
-        };
-        const on_bar_leave = function() {
-            holding_bar = false;
-            line.stroke({ color: "#9990" });
         };
         parent.addEventListener("mousemove", (e) => {
             on_bar_move(e.clientX, parent.getBoundingClientRect());
@@ -505,15 +497,17 @@ simplex = (function() {
         parent.addEventListener("touchstart", (e) => {
             sx = e.touches[0].clientX;
             sy = e.touches[0].clientY;
+            touching = 2;
         });
         parent.addEventListener("touchmove", (e) => {
-            if (!touching) {
-                if (e.touches[0].clientX - sx > e.touches[0].clientY - sy) {
+            if (touching > 1) {
+                touching -= 1;
+            }else if (touching === 1) {
+                if (Math.abs(e.touches[0].clientX - sx) > Math.abs(e.touches[0].clientY - sy)) {
                     holding_bar = true;
+                    line.stroke({ color: "#9997" });
                 }
-                touching = true;
-                e.preventDefault();
-                e.stopPropagation();
+                touching = 0;
             } else {
                 if (holding_bar) {
                     on_bar_move(e.touches[0].clientX, parent.getBoundingClientRect());
@@ -523,8 +517,8 @@ simplex = (function() {
             }
         });
         parent.addEventListener("touchend", (e) => {
-            on_bar_leave();
-            touching = false;
+            holding_bar = false;
+            line.stroke({ color: "#9990" });
         });
     };
 
