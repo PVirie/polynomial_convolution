@@ -484,6 +484,7 @@ simplex = (function() {
 
         let touching = false;
         let sx = null;
+        let sy = null;
         let holding_bar = false;
 
         const on_bar_enter = function() {
@@ -503,10 +504,11 @@ simplex = (function() {
         });
         parent.addEventListener("touchstart", (e) => {
             sx = e.touches[0].clientX;
+            sy = e.touches[0].clientY;
         });
         parent.addEventListener("touchmove", (e) => {
             if (!touching) {
-                if (e.touches[0].clientX - sx > 5) {
+                if (e.touches[0].clientX - sx > e.touches[0].clientY) {
                     holding_bar = true;
                 }
                 touching = true;
