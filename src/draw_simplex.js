@@ -508,7 +508,7 @@ simplex = (function() {
         });
         parent.addEventListener("touchmove", (e) => {
             if (!touching) {
-                if (e.touches[0].clientX - sx > e.touches[0].clientY) {
+                if (e.touches[0].clientX - sx > e.touches[0].clientY - sy) {
                     holding_bar = true;
                 }
                 touching = true;
