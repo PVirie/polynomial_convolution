@@ -14,7 +14,6 @@
 
 <body>
     <div class="">
-        
     </div>
     <div class="content paper">
         <h1>&#8747 Polynomial algebra as convolution</h1>
@@ -23,17 +22,14 @@
             graph convolution.
             m-simplex.
         </p>
-
         This polynomial \( x^2 + 2xy + y^2 \) can be written as:
         <div class="virie-algebra-block axes-xy">
             {x^2 + 2xy + y^2}
         </div>
-
         This polynomial \( x^5 + 5x^4 + 10x^3 + 10x^2 + 5x + 1 \) can be written as:
         <div class="virie-algebra-block axes-x1">
             {x^5 + 5x^4 + 10x^3 + 10x^2 + 5x + 1}
         </div>
-
         Also we can generalize the representation up to 3 axes in 2d space.
         This polynomial \( 1 + 3x - y - 2xy + 2x^2 \) can be written as:
         <div class="virie-algebra-block axes-xy1">
@@ -42,43 +38,40 @@
         <p>
             Muliplication is convolution.
         </p>
-
         <div class="mathjax">
-            \[ (1 + x - y)(1 + 2x) = 1 + 3x - y - 2xy + 2x^2  \]
-            </div>
-            <div class="virie-algebra-block axes-xy1">
-                {1 + x - y}.{1 + 2x} = {1 + 3x - y - 2xy + 2x^2} 
-            </div>
-            
+            \[ (1 + x - y)(1 + 2x) = 1 + 3x - y - 2xy + 2x^2 \]
+        </div>
+        <div class="virie-algebra-block axes-xy1">
+            {1 + x - y}.{1 + 2x} = {1 + 3x - y - 2xy + 2x^2}
+        </div>
         I have another sub-trick here, if you decide to multiply two one-dimension polynomials, do write the artifacts in diagonal.
-        As we usually convolve with the smaller operand, to reduce working memory consumption. 
-        Writing in diagonal taking less space because it only requires the number of rows equal to the number of terms in the moving operand. 
-        \[ (1 - x + x^2 - x^3 + x^4 - x^5).(1 + x + x^2 + x^3) = (1 + x^2 - x^6 - x^8)  \]
+        As we usually convolve with the smaller operand, to reduce working memory consumption.
+        Writing in diagonal taking less space because it only requires the number of rows equal to the number of terms in the moving operand.
+        
+        <div class="mathjax">
+        \[ (1 - x + x^2 - x^3 + x^4 - x^5).(1 + x + x^2 + x^3) = (1 + x^2 - x^6 - x^8) \]
+        </div>
         <div class="virie-algebra-block axes-x1">
             {1 - x + x^2 - x^3 + x^4 - x^5}.{1 + x + x^2 + x^3} = {1 + 0x + x^2 + 0x^3 + 0x^4 + 0x^5 - x^6 + 0x^7 - x^8}
         </div>
-        
         <p>
             Division is merely a game of finding pattern.
         </p>
-
         <div class="virie-algebra-block axes-x1">
             {2 + 3x - 2x^2}/{1 + 2x} = {2 - x}
         </div>
-
         <div class="virie-algebra-block axes-x1">
             {1 + 0x + x^2 + 0x^3 + 0x^4 + 0x^5 - x^6 + 0x^7 - x^8}/{1 + x + x^2 + x^3} = {-x^5 + x^4 - x^3 + x^2 - x + 1}
         </div>
-
         <p> The best practice is to solve the corners first.</p>
         <p>
-            You may notice that I convolve both examples in different order sequences. 
-            In fact, we do not have to follow the left to right sequence as long as every bin has been convolved.    
+            You may notice that I convolve both examples in different order sequences.
+            In fact, we do not have to follow the left to right sequence as long as every bin has been convolved.
             Compare to long division, you don't have to follow sequence if you know that the quotient is divisible by the denominator, just make sure that every bin has been counted (like convolution).
             If you follow the sequence, from the highest to the lowest degree, you will always get the lowest degree remainder.
         </p>
         <div class="mathjax">
-        \[ \frac{1 + 3x - y - 2xy + 2x^2}{1 + x - y} = 1 + 2x \]
+            \[ \frac{1 + 3x - y - 2xy + 2x^2}{1 + x - y} = 1 + 2x \]
         </div>
         <div class="virie-algebra-block axes-xy1">
             {1 + 3x - y + 2x^2 - 2xy}/{1 + x - y} = {1 + 2x}
@@ -86,50 +79,41 @@
         <p>
             Using human visual cortex to solve polynomial algebra,
             we can exploit the consistency in the structure.
-            The benefit lies in the fact that 
+            The benefit lies in the fact that
             <ul>
                 <li>we do not have to rearrange the degree terms to sum the coefficients.
                     We can immediately find the location to put the terms.</li>
                 <li>and we can guess the shape of operand at a glance.</li>
             </ul>
         </p>
-
         <div class="mathjax">
-        \[ \frac{z^3  + 2xz^2  - yz^2 - zx^2  - 2xzy + yx^2}{z^2 + 2xz - x^2} = z - y \]
+            \[ \frac{z^3 + 2xz^2 - yz^2 - zx^2 - 2xzy + yx^2}{z^2 + 2xz - x^2} = z - y \]
         </div>
         <div class="virie-algebra-block medium axes-xyz">
             {z^3 - zx^2 + yx^2 - yz^2 + 2xz^2 - 2xzy}/{z^2 + 2xz - x^2} = {z - y}
         </div>
-
         <p>
             Though using this method in Euclidean space, we can extend to 3 variables. But I believe that more if possible for someone that can reason with high dimension.
         </p>
-
         <div class="mathjax">
-        \[ (x^3 + x^2z - xz^2 + z^3 + z^2y + zy^2 + y^3 - y^2x + x^2y - xyz).(x + y + z) = (z^4 + 2yz^3 + 2y^2z^2 -xyz^2 + 2y^3z -xy^2z + x^2yz + 2x^3z + y^4 + 2x^3y + x^4) \]
+            \[ (x^3 + x^2z - xz^2 + z^3 + z^2y + zy^2 + y^3 - y^2x + x^2y - xyz).(x + y + z) = (z^4 + 2yz^3 + 2y^2z^2 -xyz^2 + 2y^3z -xy^2z + x^2yz + 2x^3z + y^4 + 2x^3y + x^4) \]
         </div>
-
         <div class="virie-algebra-block medium axes-xyz">
             {x^3 + x^2z - xz^2 + z^3 + z^2y + zy^2 + y^3 - y^2x + x^2y - xyz}.{x + y + z} = {z^4 + 2yz^3 + 2y^2z^2 -xyz^2 + 2y^3z -xy^2z + x^2yz + 2x^3z + y^4 + 2x^3y + x^4}
         </div>
-
         <div class="mathjax">
-        \[ \frac{- z^5 + 2z^4x - 3z^3x^2 + z^2x^3 - x^5 + 3x^3y^2 - x^2y^3 + y^5 + 2y^4z + y^3z^2 + y^2z^3 + 2xz^3y + xz^2y^2 - 3x^2z^2y - x^2zy^2 + 4x^3yz}{-x^2 + xy + y^2 + yz - z^2 + zx} = x^3 + x^2z - xz^2 + z^3 + z^2y + zy^2 + y^3 - y^2x + x^2y - xyz \]
+            \[ \frac{- z^5 + 2z^4x - 3z^3x^2 + z^2x^3 - x^5 + 3x^3y^2 - x^2y^3 + y^5 + 2y^4z + y^3z^2 + y^2z^3 + 2xz^3y + xz^2y^2 - 3x^2z^2y - x^2zy^2 + 4x^3yz}{-x^2 + xy + y^2 + yz - z^2 + zx} = x^3 + x^2z - xz^2 + z^3 + z^2y + zy^2 + y^3 - y^2x + x^2y - xyz \]
         </div>
-        
         <div class="virie-algebra-block large axes-xyz">
             {- z^5 + 2z^4x - 3z^3x^2 + z^2x^3 - x^5 + 3x^3y^2 - x^2y^3 + y^5 + 2y^4z + y^3z^2 + y^2z^3 + 2xz^3y + xz^2y^2 - 3x^2z^2y - x^2zy^2 + 4x^3yz}/{-x^2 + xy + y^2 + yz - z^2 + zx} = {x^3 + x^2z - xz^2 + z^3 + z^2y + zy^2 + y^3 - y^2x + x^2y - xyz}
         </div>
-
         <p>
             Now can you solve this problem using what you've just learned?
         </p>
-
         <div class="mathjax">
-        if \( x^2 + y^2 + (-x-y)^2 = 185 \), then
-            \[ \frac{\left( x^3 + y^3 + (-x-y)^3 \right) \left( x^4 + y^4 + (-x-y)^4 \right)}{ \left( x^5 + y^5 + (-x-y)^5 \right)}  =  \; ? \]
+            if \( x^2 + y^2 + (-x-y)^2 = 185 \), then
+            \[ \frac{\left( x^3 + y^3 + (-x-y)^3 \right) \left( x^4 + y^4 + (-x-y)^4 \right)}{ \left( x^5 + y^5 + (-x-y)^5 \right)} = \; ? \]
         </div>
-
         <p>
             I'm a cognitive scientist.
             I essentially turn polynomial algebra into a simple graphic game.

@@ -141,14 +141,15 @@ simplex = (function() {
         const timeline = new SVG.Timeline();
         const cx = width / 2;
         const cy = height / 2;
-        const node_padding = Math.min(200, height) * 0.2;
-        const grid = new Simplex_grid(axes, node_padding);
 
         const terms = expression.value.serialize();
+        
+        const node_padding = Math.min((width * 2 / 3) / (expression.value.max_degree), 50);
+        const grid = new Simplex_grid(axes, node_padding);
 
         let i = 0;
         for (const term of terms) {
-            const p_s = grid.grid((i++ - Math.floor(terms.length / 2)) * 1.5, 0);
+            const p_s = grid.grid((i++ - (terms.length - 1) / 2) * 1.5, 0);
             const term_graphics = draw_term(parent, term[0], term[1]);
             term_graphics[0].center(cx + p_s.x, cy + p_s.y);
 
@@ -173,11 +174,17 @@ simplex = (function() {
         const dim = axes.length;
         const cx = width / 2;
         const cy = dim == 2 ? height / 2 : (height * 2) / 3;
-        const node_padding = 50;
+        
+        const serialized_exp_res = exp_res.serialize();
+        const serialized_exp_0 = exp_0.serialize();
+        const serialized_exp_1 = exp_1.serialize();
+
+        const node_padding = Math.min((width * 2 / 3) / (exp_res.max_degree), 50);
+
         const grid = new Simplex_grid(axes, node_padding);
         const grid2 = new Simplex_grid(axes, node_padding * 1.5);
 
-        for (const term of exp_res.serialize()) {
+        for (const term of serialized_exp_res) {
             const p = grid.resolve.apply(grid, term.slice(2));
             const term_graphics = draw_term(parent, term[0], null);
             term_graphics[0].center(cx + p.x, cy + p.y).attr({ opacity: 0.0 });
@@ -187,13 +194,13 @@ simplex = (function() {
             settle(term_graphics[1], timeline, 0.2, 0.8);
         }
 
-        const serialized_exp_0 = exp_0.serialize();
         const duration_offset = (0.7 - 0.1) / (serialized_exp_0.length + 1);
         const base_term_pos = [];
         for (const term of serialized_exp_0) {
             const o = grid.resolve.apply(grid, term.slice(2));
             const term_graphics = draw_term(parent, term[0], null);
-            term_graphics[0].center(width / 3 + o.x, cy + o.y);
+            if(dim == 2) term_graphics[0].center(cx + o.x, height/3 + o.y);
+            else term_graphics[0].center(width/3 + o.x, cy + o.y);
 
             const p = grid2.resolve.apply(grid2, term.slice(2));
             move(term_graphics[0], timeline, 0.1, 0, cx + p.x, cy + p.y);
@@ -208,13 +215,12 @@ simplex = (function() {
             y_gap = 20;
             artifact_grid = grid2;
         }
-
-        const serialized_exp_1 = exp_1.serialize();
         for (let i = 0; i < serialized_exp_1.length; ++i) {
             const term = serialized_exp_1[i];
             const p = grid.resolve.apply(grid, term.slice(2));
             const term_graphics = draw_term(parent, term[0], null);
-            term_graphics[0].center((width * 2) / 3 + p.x, cy + p.y);
+            if(dim == 2) term_graphics[0].center(cx + p.x, height*2/3 + p.y);
+            else term_graphics[0].center(width*2/3 + p.x, cy + p.y);
             term_graphics[1].attr({ fill: "#070" });
 
             fade_half(term_graphics[1], timeline, duration_offset, 0.1);
@@ -248,12 +254,17 @@ simplex = (function() {
         const timeline = new SVG.Timeline();
         const cx = width / 2;
         const cy = (height * 2) / 3;
-        const node_padding = 50;
+
+        const serialized_exp_res = exp_res.serialize();
+        const serialized_exp_0 = exp_0.serialize();
+        const serialized_exp_1 = exp_1.serialize();
+
+        const node_padding = Math.min((height * 2 / 3) / (exp_0.max_degree), 50);
+
         const grid = new Simplex_grid(axes, node_padding);
         const grid2 = new Simplex_grid(axes, node_padding * 1.75);
 
         const res_term_pos = [];
-        const serialized_exp_res = exp_res.serialize();
         const duration_offset = (0.6 - 0.1) / (serialized_exp_res.length + 2);
         for (let j = 0; j < serialized_exp_res.length; ++j) {
             const term = serialized_exp_res[j];
@@ -271,7 +282,6 @@ simplex = (function() {
             res_term_pos.push(p);
         }
 
-        const serialized_exp_0 = exp_0.serialize();
         for (const term of serialized_exp_0) {
             const o = grid.resolve.apply(grid, term.slice(2));
             const term_graphics = draw_term(parent, term[0], null);
@@ -282,7 +292,6 @@ simplex = (function() {
             fade_out(term_graphics[0], timeline, 0.02, 0.1 - 0.02 + duration_offset * 3);
         }
 
-        const serialized_exp_1 = exp_1.serialize();
         for (const term of serialized_exp_1) {
             const p = grid.resolve.apply(grid, term.slice(2));
             const term_graphics = draw_term(parent, term[0], null);
@@ -339,14 +348,19 @@ simplex = (function() {
         const timeline = new SVG.Timeline();
         const cx = width / 2;
         const cy = height / 2;
-        const node_padding = 50;
+
+        const serialized_exp_res = exp_res.serialize();
+        const serialized_exp_0 = exp_0.serialize();
+        const serialized_exp_1 = exp_1.serialize();
+
+        const node_padding = Math.min((width * 2 / 3) / (exp_0.max_degree * 1.5), 50);
+
         const grid = new Simplex_grid(axes, node_padding);
         const grid2 = new Simplex_grid(axes, node_padding * 1.75);
 
         const y_gap = 20;
 
         const res_term_pos = [];
-        const serialized_exp_res = exp_res.serialize();
         const duration_offset = (0.6 - 0.1) / (serialized_exp_res.length + 2);
         for (let j = 0; j < serialized_exp_res.length; ++j) {
             const term = serialized_exp_res[j];
@@ -364,8 +378,6 @@ simplex = (function() {
             res_term_pos.push(p);
         }
 
-        const serialized_exp_0 = exp_0.serialize();
-        const serialized_exp_1 = exp_1.serialize();
         for (const term of serialized_exp_0) {
             const o = grid.resolve.apply(grid, term.slice(2));
             const term_graphics = draw_term(parent, term[0], null);
