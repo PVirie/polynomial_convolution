@@ -512,6 +512,8 @@ simplex = (function() {
                     holding_bar = true;
                 }
                 touching = true;
+                e.preventDefault();
+                e.stopPropagation();
             } else {
                 if (holding_bar) {
                     on_bar_move(e.touches[0].clientX, parent.getBoundingClientRect());
