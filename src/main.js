@@ -15,25 +15,26 @@ const parse_block = function(block) {
 };
 
 const parse_all = function() {
-    const polynomial_blocks = document.querySelectorAll(".virie-algebra-block");
     for (const b of polynomial_blocks) {
         if (b.parts == null) {
             const parts = parse_block(b);
             b.parts = parts;
         }
+        if(b.animator != null) b.animator.clear();
+        
         while (b.firstChild) b.firstChild.remove();
-        simplex.draw(b, b.parts[0], b.parts[1]);
+        b.animator = simplex.draw(b, b.parts[0], b.parts[1]);
     }
 }
 
 let delayer = null;
+const polynomial_blocks = document.querySelectorAll(".virie-algebra-block");
 
 window.addEventListener('resize', function() {
     if (delayer != null) clearTimeout(delayer);
     delayer = setTimeout(function() {
         parse_all();
     }, 500);
-
 });
 
 window.onload = function() {

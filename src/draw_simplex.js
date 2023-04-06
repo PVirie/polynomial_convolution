@@ -520,6 +520,13 @@ simplex = (function() {
             holding_bar = false;
             line.stroke({ color: "#9990" });
         });
+
+        return {
+            clear: function() {
+                //hack svg.js to clear runners.
+                timeline._runners = [];
+            }
+        }
     };
 
     return {
