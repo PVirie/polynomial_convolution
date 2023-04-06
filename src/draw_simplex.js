@@ -52,8 +52,8 @@ class Simplex_grid {
     }
 }
 
-simplex = (function () {
-    const draw_term = function (parent, coefficient, degrees) {
+simplex = (function() {
+    const draw_term = function(parent, coefficient, degrees) {
         const g = parent.group();
         const coeff_g = g
             .text(coefficient.toString())
@@ -95,29 +95,35 @@ simplex = (function () {
         return [g, coeff_g, degree_g];
     };
 
-    const fade_in = function (svg_object, timeline, duration, start) {
+    const fade_in = function(svg_object, timeline, duration, start) {
         const runner = new SVG.Runner(duration);
         runner.attr({ opacity: 1.0 });
         runner.element(svg_object);
         timeline.schedule(runner.persist(true), start, "absolute");
     };
 
-    const fade_out = function (svg_object, timeline, duration, start) {
+    const fade_out = function(svg_object, timeline, duration, start) {
         const runner = new SVG.Runner(duration);
         runner.attr({ opacity: 0.0 });
         runner.element(svg_object);
         timeline.schedule(runner.persist(true), start, "absolute");
     };
 
-    const move = function (svg_object, timeline, duration, start, x, y, ease = "<>") {
+    const fade_half = function(svg_object, timeline, duration, start) {
         const runner = new SVG.Runner(duration);
-        runner.ease(ease);
+        runner.attr({ opacity: 0.3 });
+        runner.element(svg_object);
+        timeline.schedule(runner.persist(true), start, "absolute");
+    };
+
+    const move = function(svg_object, timeline, duration, start, x, y) {
+        const runner = new SVG.Runner(duration);
         runner.center(x, y);
         runner.element(svg_object);
         timeline.schedule(runner.persist(true), start, "absolute");
     };
 
-    const settle = function (svg_object, timeline, duration, start) {
+    const settle = function(svg_object, timeline, duration, start) {
         const runner = new SVG.Runner(duration / 4);
         runner.attr({ fill: "#fff" });
         runner.element(svg_object);
@@ -129,7 +135,7 @@ simplex = (function () {
         timeline.schedule(runner2.persist(true), start + duration / 4, "absolute");
     };
 
-    const transform_to_simplex = function (axes, expression, parent, width, height) {
+    const transform_to_simplex = function(axes, expression, parent, width, height) {
         // duration is 0.0-1.0
         const timeline = new SVG.Timeline();
         const cx = width / 2;
@@ -160,13 +166,13 @@ simplex = (function () {
         return timeline;
     };
 
-    const multiply = function (axes, exp_0, exp_1, exp_res, parent, width, height) {
+    const multiply = function(axes, exp_0, exp_1, exp_res, parent, width, height) {
         // duration is 0.0-1.0
         const timeline = new SVG.Timeline();
         const dim = axes.length;
         const cx = width / 2;
-        const cy = height / 2;
-        const node_padding = Math.min(200, height) * 0.2;
+        const cy = dim == 2 ? height / 2 : (height * 2) / 3;
+        const node_padding = 50;
         const grid = new Simplex_grid(axes, node_padding);
         const grid2 = new Simplex_grid(axes, node_padding * 1.5);
 
@@ -210,6 +216,8 @@ simplex = (function () {
             term_graphics[0].center((width * 2) / 3 + p.x, cy + p.y);
             term_graphics[1].attr({ fill: "#070" });
 
+            fade_half(term_graphics[1], timeline, duration_offset, 0.1);
+
             const p2 = artifact_grid.resolve.apply(artifact_grid, term.slice(2));
             const y_offset = (i + 1) * y_gap;
             for (let j = 0; j < base_term_pos.length; ++j) {
@@ -234,12 +242,12 @@ simplex = (function () {
         return timeline;
     };
 
-    const divide_3d = function (axes, exp_0, exp_1, exp_res, parent, width, height) {
+    const divide_3d = function(axes, exp_0, exp_1, exp_res, parent, width, height) {
         // duration is 0.0-1.0
         const timeline = new SVG.Timeline();
         const cx = width / 2;
         const cy = (height * 2) / 3;
-        const node_padding = Math.min(200, height) * 0.2;
+        const node_padding = 50;
         const grid = new Simplex_grid(axes, node_padding);
         const grid2 = new Simplex_grid(axes, node_padding * 1.75);
 
@@ -279,6 +287,8 @@ simplex = (function () {
             const term_graphics = draw_term(parent, term[0], null);
             term_graphics[0].center((width * 2) / 3 + p.x, cy + p.y);
             term_graphics[1].attr({ fill: "#070" });
+
+            fade_half(term_graphics[1], timeline, duration_offset, 0.1);
 
             for (let j = 0; j < res_term_pos.length; ++j) {
                 move(term_graphics[0], timeline, duration_offset, 0.1 + duration_offset * j, cx + res_term_pos[j].x + p.x, cy + res_term_pos[j].y + p.y);
@@ -323,12 +333,12 @@ simplex = (function () {
         return timeline;
     };
 
-    const divide_2d = function (axes, exp_0, exp_1, exp_res, parent, width, height) {
+    const divide_2d = function(axes, exp_0, exp_1, exp_res, parent, width, height) {
         // duration is 0.0-1.0
         const timeline = new SVG.Timeline();
         const cx = width / 2;
         const cy = height / 2;
-        const node_padding = Math.min(200, height) * 0.2;
+        const node_padding = 50;
         const grid = new Simplex_grid(axes, node_padding);
         const grid2 = new Simplex_grid(axes, node_padding * 1.75);
 
@@ -372,6 +382,8 @@ simplex = (function () {
             term_graphics[0].center(cx + p.x, (height * 2) / 3 + p.y);
             term_graphics[1].attr({ fill: "#070" });
 
+            fade_half(term_graphics[1], timeline, duration_offset, 0.1);
+
             const p2 = grid2.resolve.apply(grid2, term.slice(2));
             const y_offset = (i + 1) * y_gap;
             for (let j = 0; j < res_term_pos.length; ++j) {
@@ -403,7 +415,7 @@ simplex = (function () {
         return timeline;
     };
 
-    const operation = function (axes, expression, parent, width, height) {
+    const operation = function(axes, expression, parent, width, height) {
         const left = expression.left;
         const right = expression.right;
         let exp_0, exp_1, exp_res;
@@ -427,7 +439,7 @@ simplex = (function () {
         }
     };
 
-    const draw = function (parent, axes, expression) {
+    const draw = function(parent, axes, expression) {
         // Set the dimensions of the plot
         const container_rect = parent.getBoundingClientRect();
         const computed_style = getComputedStyle(parent);
@@ -439,6 +451,7 @@ simplex = (function () {
         const polynomial_group = svg.group();
 
         let timeline = null;
+
         if (expression.type === "node") {
             timeline = transform_to_simplex(axes, expression, polynomial_group, width, height);
         } else if (expression.type === "=") {
@@ -447,40 +460,35 @@ simplex = (function () {
 
         const control_group = svg.group();
 
-        const bar_padding = width * 0.05;
-        const line = control_group.line(bar_padding, height - 10, width - bar_padding, height - 10);
+        const bar_padding = height * 0.05;
+        const line = control_group.line(width - 10, bar_padding, width - 10, height - bar_padding);
         line.stroke({ color: "#9990", width: 5, linecap: "round" });
 
-        const bar = control_group.line(0, height - 10, bar_padding * 2, height - 10);
+        const bar = control_group.line(width - 10, 0, width - 10, bar_padding * 2);
         bar.stroke({ color: "#fffc", width: 7, linecap: "round" });
 
-        move(bar, timeline, 1.0, 0, width - bar_padding, height - 10, "-");
+        move(bar, timeline, 1.0, 0, width - 10, height - bar_padding, "-");
 
         let holding_bar = false;
-        const on_bar_enter = function () {
+        const on_bar_enter = function() {
             holding_bar = true;
             line.stroke({ color: "#9997" });
         };
-        const on_bar_move = function (clientX) {
-            const time = (clientX - container_rect.x - bar_padding) / (container_rect.width - bar_padding * 2);
+        const on_bar_move = function(clientY) {
+            const time = (clientY - container_rect.y - bar_padding) / (container_rect.height - bar_padding * 2);
             if (holding_bar) {
                 timeline.time(Math.max(0, time));
                 return true;
             }
             return false;
         };
-        const on_bar_leave = function () {
+        const on_bar_leave = function() {
             holding_bar = false;
             line.stroke({ color: "#9990" });
         };
-        parent.addEventListener("touchstart", (e) => {
-            on_bar_enter();
-        });
-        parent.addEventListener("mousedown", (e) => {
-            on_bar_enter();
-        });
+        bar.on("mousedown", on_bar_enter);
         parent.addEventListener("mousemove", (e) => {
-            if (on_bar_move(e.clientX)) {
+            if (on_bar_move(e.clientY)) {
                 e.preventDefault();
                 e.stopPropagation();
                 e.cancelBubble = true;
@@ -488,7 +496,7 @@ simplex = (function () {
             }
         });
         parent.addEventListener("touchmove", (e) => {
-            if (on_bar_move(e.touches[0].clientX)) {
+            if (on_bar_move(e.touches[0].clientY)) {
                 e.preventDefault();
             }
         });
