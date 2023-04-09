@@ -27,7 +27,26 @@ const parse_all = function() {
     }
 }
 
+const bib_index = {};
+const compile_citation = function() {
+    const bib = document.querySelector(".bibliography");
+    for (const b of citation_blocks) {
+        const content = b.innerHTML;
+        if(bib_index[content] == null) {
+            bib_index[content] = Object.keys(bib_index).length + 1;
+        }
+        if(bib != null) {
+            const li = document.createElement("li");
+            li.innerHTML = bib_index[content] + ". " + content;
+            bib.appendChild(li);
+        }
+        b.innerHTML = bib_index[content];
+    }
+}
+
+
 let delayer = null;
+const citation_blocks = document.querySelectorAll(".cite");
 const polynomial_blocks = document.querySelectorAll(".virie-algebra-block");
 
 window.addEventListener('resize', function() {
@@ -39,4 +58,5 @@ window.addEventListener('resize', function() {
 
 window.onload = function() {
     parse_all();
+    compile_citation();
 };

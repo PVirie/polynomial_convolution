@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virie's trick for polynomial algebra</title>
+    <title>Virie's trick for polynomial arithmetic</title>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="icon" type="image/x-icon" href="./resources/virie_symbol_small.png">
@@ -16,12 +16,26 @@
     <div class="">
     </div>
     <div class="content paper">
-        <h1>&#8747 Polynomial algebra as convolution</h1>
-        <p>
-            A perspective to represent polynomials.
-            graph convolution.
-            m-simplex.
+        <h1>&#8747 Polynomial arithmetic as convolution</h1>
+        <hr/>
+        <div class="kernel">
+            <h2> Kernel: </h2>
+            <ul>
+                <li> A perspective to represent polynomials using simplexes. </li>
+                <li> A trick to perform polynomial multiplicative operations based on graph convolution. </li>
+            </ul>
+        </div>
+
+        <p class="first">
+        Polynomials are facinating. They serve as fundamental components in the realm of mathematical education for us.<span class="cite">Polynomials. Brilliant.org. Retrieved 15:25, April 9, 2023, from https://brilliant.org/wiki/polynomials/</span>  Their orthogonal basis properties also enable the independent factorization of their linear combinations, making them an ideal starting point for machine learning practictional.<span class="cite">Schölkopf, B., Smola, A. J., & Bach, F. (2002). Learning with kernels: support vector machines, regularization, optimization, and beyond. MIT press.</span>
         </p>
+
+        <p>
+        <t>Nonetheless, manual calculations involving polynomials can be challenging due to the numerous terms we need to jot down and cancel out during arithmetic operations. In this article, I aim to showcase a technique that simplifies polynomial arithmetic, making it less burdensome for individuals.
+        </p>
+
+        <h2>&#8706 Yet another way to represent polynomials</h2>
+
         This polynomial \( x^2 + 2xy + y^2 \) can be written as:
         <div class="virie-algebra-block axes-xy">
             {x^2 + 2xy + y^2}
@@ -35,9 +49,11 @@
         <div class="virie-algebra-block axes-xy1">
             {1 + 3x - y - 2xy + 2x^2 + 0y^2}
         </div>
-        <p>
-            Muliplication is convolution.
-        </p>
+
+
+        <h2>&#8706 Operations using graph convolution</h2>
+
+        Muliplication is convolution.
         <div class="mathjax">
             \[ (1 + x - y)(1 + 2x) = 1 + 3x - y - 2xy + 2x^2 \]
         </div>
@@ -76,6 +92,7 @@
         <div class="virie-algebra-block axes-xy1">
             {1 + 3x - y + 2x^2 - 2xy}/{1 + x - y} = {1 + 2x}
         </div>
+
         <p>
             Using human visual cortex to solve polynomial algebra,
             we can exploit the consistency in the structure.
@@ -119,6 +136,11 @@
             I essentially turn polynomial algebra into a simple graphic game.
             I hope this idea will help those who struggle in math.
         </p>
+        <hr/>
+
+        <ul class="bibliography">
+        </ul>
+
     </div>
     <script src="./libs/svg.min.js"></script>
     <script src="./src/polynomial.js"></script>
