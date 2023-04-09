@@ -52,10 +52,13 @@
             {1 + 3x - y - 2xy + 2x^2 + 0y^2}
         </div>
 
+        <p>
+        This representation offers a more compact and convenient way to perform convolution. It's worth noting that I've omitted the degree component from the term, as during polynomial operations, we must define and share the axes among the operands anyway.
+        </p>
 
         <h2>&#8706 Operations using graph convolution</h2>
 
-        Performing polynomial muliplication is convolution, for example:
+        Performing polynomial muliplication is simply convolution<span class="cite">This is infact cross-correlation. But in machine learning community, they are both interchangeable.</span>, for example:
         <div class="mathjax">
             \[ (1 + x - y)(1 + 2x) = 1 + 3x - y - 2xy + 2x^2 \]
         </div>
@@ -133,7 +136,7 @@
             \[ \frac{- z^5 + 2z^4x - 3z^3x^2 + z^2x^3 - x^5 + 3x^3y^2 - x^2y^3 + y^5 + 2y^4z + y^3z^2 + y^2z^3 + 2xz^3y + xz^2y^2 - 3x^2z^2y - x^2zy^2 + 4x^3yz}{-x^2 + xy + y^2 + yz - z^2 + zx} = x^3 + x^2z - xz^2 + z^3 + z^2y + zy^2 + y^3 - y^2x + x^2y - xyz \]
         </div>
         <div class="virie-algebra-block large axes-xyz">
-            {- z^5 + 2z^4x - 3z^3x^2 + z^2x^3 - x^5 + 3x^3y^2 - x^2y^3 + y^5 + 2y^4z + y^3z^2 + y^2z^3 + 2xz^3y + xz^2y^2 - 3x^2z^2y - x^2zy^2 + 4x^3yz}/{-x^2 + xy + y^2 + yz - z^2 + zx} = {x^3 + x^2z - xz^2 + z^3 + z^2y + zy^2 + y^3 - y^2x + x^2y - xyz}
+            {- z^5 + 2z^4x - 3z^3x^2 + z^2x^3 - x^5 + 3x^3y^2 - x^2y^3 + y^5 + 2y^4z + y^3z^2 + y^2z^3 + 2xz^3y + xz^2y^2 - 3x^2z^2y - x^2zy^2 + 4x^3yz}/{-x^2 + xy + y^2 + yz - z^2 + zx} = {x^3 + y^3 + z^3 + x^2z + z^2y - y^2x - xz^2 + zy^2 + x^2y - xyz}
         </div>
         <p class="first">
             Though I only present the trick with atmost three variables using simplexes in Euclidean space, I believe that more if possible for individuals capable of reasoning in higher dimensions.
