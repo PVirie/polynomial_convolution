@@ -36,15 +36,17 @@
 
         <h2>&#8706 Yet another way to represent polynomials</h2>
 
-        This polynomial \( x^2 + 2xy + y^2 \) can be written as:
+        This polynomial \( x^2 + 2xy + y^2 \) can be rewritten as:
         <div class="virie-algebra-block axes-xy">
             {x^2 + 2xy + y^2}
         </div>
-        This polynomial \( x^5 + 5x^4 + 10x^3 + 10x^2 + 5x + 1 \) can be written as:
+        
+        Also for \( x^5 + 5x^4 + 10x^3 + 10x^2 + 5x + 1 \):
         <div class="virie-algebra-block axes-x1">
             {x^5 + 5x^4 + 10x^3 + 10x^2 + 5x + 1}
         </div>
-        Also we can generalize the representation up to 3 axes in 2d space.
+
+        We can generalize the representation up to 3 axes in 2D space using simplex.
         This polynomial \( 1 + 3x - y - 2xy + 2x^2 \) can be written as:
         <div class="virie-algebra-block axes-xy1">
             {1 + 3x - y - 2xy + 2x^2 + 0y^2}
@@ -53,39 +55,43 @@
 
         <h2>&#8706 Operations using graph convolution</h2>
 
-        Muliplication is convolution.
+        Performing polynomial muliplication is convolution, for example:
         <div class="mathjax">
             \[ (1 + x - y)(1 + 2x) = 1 + 3x - y - 2xy + 2x^2 \]
         </div>
         <div class="virie-algebra-block axes-xy1">
             {1 + x - y}.{1 + 2x} = {1 + 3x - y - 2xy + 2x^2}
         </div>
-        I have another sub-trick here, if you decide to multiply two one-dimension polynomials, do write the artifacts in diagonal.
-        As we usually convolve with the smaller operand, to reduce working memory consumption.
-        Writing in diagonal taking less space because it only requires the number of rows equal to the number of terms in the moving operand.
-        
+
+        I'd like to share another technique. 
+        <div class="kernel">
+            When working with two one-dimensional polynomials, do write the artifact terms diagonally.
+        </div>
+        <p>
+            Typically, we convolve with the smaller operand to minimize the working memory used. By organizing the terms diagonally, you can save space, as it only necessitates a number of rows equivalent to the terms in the moving operand.
+        </p>
+
         <div class="mathjax">
         \[ (1 - x + x^2 - x^3 + x^4 - x^5).(1 + x + x^2 + x^3) = (1 + x^2 - x^6 - x^8) \]
         </div>
         <div class="virie-algebra-block axes-x1">
             {1 - x + x^2 - x^3 + x^4 - x^5}.{1 + x + x^2 + x^3} = {1 + 0x + x^2 + 0x^3 + 0x^4 + 0x^5 - x^6 + 0x^7 - x^8}
         </div>
-        <p>
-            Division is merely a game of finding pattern.
-        </p>
+        Polynomial division is merely a game of matching patterns. Finding products that can eliminate all the starting terms.
         <div class="virie-algebra-block axes-x1">
             {2 + 3x - 2x^2}/{1 + 2x} = {2 - x}
         </div>
         <div class="virie-algebra-block axes-x1">
             {1 + 0x + x^2 + 0x^3 + 0x^4 + 0x^5 - x^6 + 0x^7 - x^8}/{1 + x + x^2 + x^3} = {-x^5 + x^4 - x^3 + x^2 - x + 1}
         </div>
-        <p> The best practice is to solve the corners first.</p>
         <p>
-            You may notice that I convolve both examples in different order sequences.
-            In fact, we do not have to follow the left to right sequence as long as every bin has been convolved.
-            Compare to long division, you don't have to follow sequence if you know that the quotient is divisible by the denominator, just make sure that every bin has been counted (like convolution).
-            If you follow the sequence, from the highest to the lowest degree, you will always get the lowest degree remainder.
+            You may notice that in both examples, I carried out the convolution using varying order sequences. In fact, it's not essential to follow a specific sequence, provided that each bin has been convolved. Unlike the long division method, which requires a left-to-right sequence, you only need to ensure that every bin is accounted for in the convolution process when the quotient is divisible by the denominator.
         </p>
+        <div class="kernel">
+            However, when dealing with remainders, adhering to a sequence from the highest to the lowest degree ensures that you obtain the lowest degree remainder.
+        </div>
+
+        Here is a division using simplexes:
         <div class="mathjax">
             \[ \frac{1 + 3x - y - 2xy + 2x^2}{1 + x - y} = 1 + 2x \]
         </div>
@@ -93,25 +99,30 @@
             {1 + 3x - y + 2x^2 - 2xy}/{1 + x - y} = {1 + 2x}
         </div>
 
-        <p>
-            Using human visual cortex to solve polynomial algebra,
-            we can exploit the consistency in the structure.
-            The benefit lies in the fact that
+        When working with simplexes, the best practice is to solve the corners first.
+        <div class="mathjax">
+            \[ \frac{1 + 4x - 2y + 5x^2 - 6xy + y^2 - 4x^2y + 2xy^2 + 2x^3}{1 + x - y} = 1 + 3x - y - 2xy + 2x^2 \]
+        </div>
+        <div class="virie-algebra-block medium axes-xy1">
+            {1 + 4x - 2y + 5x^2 - 6xy + y^2 - 4x^2y + 2xy^2 + 2x^3}/{1 + x - y} = {1 + 2x^2 - 2xy - y + 3x}
+        </div>
+
+        <p class="first">
+            By leveraging the human visual cortex for solving polynomial arithmetic, we can take advantage of the consistency in the structure. The benefits include:
             <ul>
-                <li>we do not have to rearrange the degree terms to sum the coefficients.
-                    We can immediately find the location to put the terms.</li>
-                <li>and we can guess the shape of operand at a glance.</li>
+                <li>The ability to avoid rearranging degree terms to sum the coefficients, as we can promptly identify the appropriate location to place the terms.</li>
+                <li>The capacity to quickly discern the shape of the operand with just a glance.</li>
             </ul>
         </p>
+
         <div class="mathjax">
             \[ \frac{z^3 + 2xz^2 - yz^2 - zx^2 - 2xzy + yx^2}{z^2 + 2xz - x^2} = z - y \]
         </div>
         <div class="virie-algebra-block medium axes-xyz">
             {z^3 - zx^2 + yx^2 - yz^2 + 2xz^2 - 2xzy}/{z^2 + 2xz - x^2} = {z - y}
         </div>
-        <p>
-            Though using this method in Euclidean space, we can extend to 3 variables. But I believe that more if possible for someone that can reason with high dimension.
-        </p>
+        
+        For more complicated examples:
         <div class="mathjax">
             \[ (x^3 + x^2z - xz^2 + z^3 + z^2y + zy^2 + y^3 - y^2x + x^2y - xyz).(x + y + z) = (z^4 + 2yz^3 + 2y^2z^2 -xyz^2 + 2y^3z -xy^2z + x^2yz + 2x^3z + y^4 + 2x^3y + x^4) \]
         </div>
@@ -124,17 +135,16 @@
         <div class="virie-algebra-block large axes-xyz">
             {- z^5 + 2z^4x - 3z^3x^2 + z^2x^3 - x^5 + 3x^3y^2 - x^2y^3 + y^5 + 2y^4z + y^3z^2 + y^2z^3 + 2xz^3y + xz^2y^2 - 3x^2z^2y - x^2zy^2 + 4x^3yz}/{-x^2 + xy + y^2 + yz - z^2 + zx} = {x^3 + x^2z - xz^2 + z^3 + z^2y + zy^2 + y^3 - y^2x + x^2y - xyz}
         </div>
-        <p>
-            Now can you solve this problem using what you've just learned?
+        <p class="first">
+            Though I only present the trick with atmost three variables using simplexes in Euclidean space, I believe that more if possible for individuals capable of reasoning in higher dimensions.
         </p>
+        Now can you solve this problem using what you've just learned?
         <div class="mathjax">
             if \( x^2 + y^2 + (-x-y)^2 = 185 \), then
             \[ \frac{\left( x^3 + y^3 + (-x-y)^3 \right) \left( x^4 + y^4 + (-x-y)^4 \right)}{ \left( x^5 + y^5 + (-x-y)^5 \right)} = \; ? \]
         </div>
-        <p>
-            I'm a cognitive scientist.
-            I essentially turn polynomial algebra into a simple graphic game.
-            I hope this idea will help those who struggle in math.
+        <p class="first">
+            In essence, I have transformed polynomial arithmetic into a straightforward graphical game. My hope is that this technique will assist those who find math challenging, making their learning experience more enjoyable and accessible.
         </p>
         <hr/>
 
